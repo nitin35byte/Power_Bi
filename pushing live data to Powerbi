@@ -1,0 +1,36 @@
+import pandas as pd
+from datetime import datetime
+import requests
+import time
+import random
+
+def data_generation():
+    surr_id = random.randint(1,3)
+    speed = random.randint(20,200)
+    date = datetime.today().strftime("%Y-%m-%d")
+    time = datetime.now().isoformat()
+    
+    return[surr_id , speed , date , time]
+
+if __name__ =='__main__':
+    REST_API_url = 'https://api.powerbi.com/beta/954483fa-e5b4-423f-ac83-0db80aa3f8d0/datasets/9a3b9086-4991-4bc7-842b-c15f5094ccbc/rows?key=cpJwBoh9Qg4l2xSxMl47KMfgc%2FzhxcO71OU7TWjuzK517uvhgSjYrO54MioKaVgtVMj3TBtW4l9E2lRijXG%2FEQ%3D%3D'
+    
+    while True:
+        data_raw = []
+        for i in range(1):
+            row= data_generation()
+            data_raw.append(row)
+            print('data_raw' , data_raw)
+            
+        # set the header record
+        HEADER = ["surr_id", "speed", "date", "time"]
+        
+        data_df = pd.DataFrame(data_raw , column = HEADER)
+        data_json = bytes(data_df.tojson(orientd='records') , encoding ='utf-8')
+        print("JSON dataset", data_json)
+        
+        # Post the data on the Power BI API
+        req = requests.post(REST_API_URL, data_json)
+
+        print("Data posted in Power BI API")
+        time.sleep(2)
